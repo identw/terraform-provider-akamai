@@ -19,8 +19,4 @@ To automatically install the Akamai Provider, run `terraform init` on a configur
 
 ## Documentation
 
-You can find documentation for the Akamai Provider on the [Terraform Website](https://registry.terraform.io/providers/akamai/akamai/latest/docs).
-
-## Credits
-
-Akamai Provider for Terraform uses a version of `dnsjava` that was modified by Akamai. `dnsjava` is used under the terms of the BSD 3-clause license, as shown in [this notice](pkg/providers/dns/internal/txtrecord/jparse.go).
+You can find documentation for the Akamai Provider on the [Terraform Website](https://techdocs.akamai.com/terraform/docs/overview).
