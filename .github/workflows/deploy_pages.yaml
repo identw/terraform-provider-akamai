@@ -48,10 +48,6 @@ jobs:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
       
-      - name: test
-        run: |
-          gpg -K
-
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
@@ -60,6 +56,10 @@ jobs:
         env:
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: dist
+        run: |
+          find ./dist
 
 
 # https://github.com/mollie/tf-provider-registry-api-generator/releases/download/v0.3.2/tf-provider-registry-api-generator_0.3.2_Linux_x86_64.tar.gz
