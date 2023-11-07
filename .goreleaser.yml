@@ -14,8 +14,6 @@ builds:
   flags:
     - -trimpath
     - -tags=all
-  ldflags:
-    - -s -w -X github.com/akamai/terraform-provider-akamai/v5/version.ProviderVersion={{.Version}}
   goos:
     - windows
     - linux
