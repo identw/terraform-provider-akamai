@@ -1,0 +1,81 @@
+name: Deploy static content to Pages
+
+on:
+  push:
+    branches: ["my-main"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - run: |
+          mkdir _build
+          echo "<h1>Hello World!</h1>" > ./_build/index.html
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: './_build'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
+
+      - name: tf-provider-registry-api-generator
+        run: |
+          mkdir tf-provider-registry-api-generator
+          cd tf-provider-registry-api-generator
+          curl -L https://github.com/mollie/tf-provider-registry-api-generator/releases/download/v0.3.2/tf-provider-registry-api-generator_0.3.2_Linux_x86_64.tar.gz -o tf-provider-registry-api-generator.tar.gz
+          tar -xf ./tf-provider-registry-api-generator.tar.gz
+          mv ./tf-provider-registry-api-generator /usr/local/bin/tf-provider-registry-api-generator
+          chmod +x /usr/local/bin/tf-provider-registry-api-generator
+          cd ..
+          rm -rf tf-provider-registry-api-generator
+
+          tf-provider-registry-api-generator --help
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "1.20"
+
+
+      - name: Import GPG key
+        id: import_gpg
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+      
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: v1.20.0
+          args: release --clean
+        env:
+          GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: dist
+        run: |
+          ls -la ./dist/
+          tree ./dist/
+          find ./dist -type f
+
+
+# https://github.com/mollie/tf-provider-registry-api-generator/releases/download/v0.3.2/tf-provider-registry-api-generator_0.3.2_Linux_x86_64.tar.gz

@@ -14,8 +14,6 @@ builds:
   flags:
     - -trimpath
     - -tags=all
-  ldflags:
-    - -s -w -X github.com/akamai/terraform-provider-akamai/v5/version.ProviderVersion={{.Version}}
   goos:
     - windows
     - linux
@@ -56,13 +54,13 @@ signs:
 changelog:
   skip: true
 release:
+  disable: true
   # Visit your project's GitHub Releases page to publish this release.
   draft: true
   header: |
     # RELEASE NOTES
   footer: |
-    {{ .Env.CHANGELOG_BODY }}
+    # test
   extra_files:
     - glob: 'terraform-provider-manifest.json'
       name_template: '{{ .ProjectName }}_{{ .Version }}_manifest.json'
-#  skip: true
