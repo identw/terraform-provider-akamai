@@ -26,12 +26,12 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - run: |
-          mkdir build
-          echo "<h1>Hello World!</h1>" > ./build/index.html
+          mkdir _build
+          echo "<h1>Hello World!</h1>" > ./_build/index.html
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: './build'
+          path: './_build'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
