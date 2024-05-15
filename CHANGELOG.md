@@ -168,6 +168,14 @@
 
 #### FEATURES/ENHANCEMENTS:
 
+
+
+
+
+
+
+
+
 * Global
   * Added validation for retryable logic values.
     * `retry_max` or `AKAMAI_RETRY_MAX` - Cannot be higher than 50
