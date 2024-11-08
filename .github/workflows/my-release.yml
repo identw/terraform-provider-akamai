@@ -1,0 +1,49 @@
+# This GitHub action can publish assets for release when a tag is created.
+# Uncomment the event for tag push to have it execute when a new tag is published. 
+# You may want to constrain events to tags that match valid semver patterns.
+#
+# This uses an action (crazy-max/ghaction-import-gpg@v5) that assumes you set your
+# private key in the `GPG_PRIVATE_KEY` secret and passphrase in the `PASSPHRASE`
+# secret. If you would rather own your own GPG handling, please fork this action
+# or use an alternative one for key handling.
+#
+# You will need to pass the `--batch` flag to `gpg` in your signing step 
+# in `goreleaser` to indicate this is being used in a non-interactive mode.
+#
+name: goreleaser
+on:
+  push:
+    tags:
+      - 'v*'
+jobs:
+  goreleaser:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "1.21.12"
+      - name: Import GPG key
+        id: import_gpg
+        uses: crazy-max/ghaction-import-gpg@v5
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+      - name: Get changelog
+        run: |
+          echo 'CHANGELOG_BODY<<EOF' >> $GITHUB_ENV
+          awk '/## ([0-9]+\.?)+/{n++}; n==1; n==2{exit}' CHANGELOG.md >> $GITHUB_ENV
+          echo 'EOF'>> $GITHUB_ENV
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: v1.21
+          args: release --rm-dist
+        env:
+          GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHANGELOG_BODY: ${{ env.CHANGELOG_BODY }}
